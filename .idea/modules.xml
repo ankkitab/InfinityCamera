@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DropboxIntegrate.iml" filepath="$PROJECT_DIR$/DropboxIntegrate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/InfinityCamera.iml" filepath="$PROJECT_DIR$/InfinityCamera.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

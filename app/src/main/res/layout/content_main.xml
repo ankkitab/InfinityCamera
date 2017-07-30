@@ -12,11 +12,25 @@
     tools:context="com.example.ankkitabose.dropboxintegrate.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/accountData">
+        android:id="@+id/accountData"
+        android:layout_marginTop="59dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="1">
+
+        <Switch
+            android:text="Switch"
+            android:layout_width="104dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/switch2"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="100dp"
+            android:layout_weight="0.13" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -69,5 +83,10 @@
             android:gravity="center_horizontal"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+
     </LinearLayout>
+
+
 </RelativeLayout>

@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dropbox.core.v2.users.FullAccount;
@@ -22,30 +24,57 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int IMAGE_REQUEST_CODE = 101;
     private String ACCESS_TOKEN;
+    private boolean flag=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        if (!tokenExists()) {
-            //No token
-            //Back to LoginActivity
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-        }
-
-        ACCESS_TOKEN = retrieveAccessToken();
-        getUserAccount();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        Switch aswitch = (Switch) findViewById(R.id.switch2);
+        final ImageView profile = (ImageView) findViewById(R.id.imageView);
+        final TextView name = (TextView) findViewById(R.id.name_textView);
+        final TextView email = (TextView) findViewById(R.id.email_textView);
+   /*     final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 upload();
             }
+        }); */
+
+        aswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    flag=true;
+                    if (!tokenExists()) {
+                        //No token
+                        //Back to LoginActivity
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
+
+                    ACCESS_TOKEN = retrieveAccessToken();
+                    getUserAccount();
+                    profile.setEnabled(true);
+                    name.setEnabled(true);
+                    email.setEnabled(true);
+                //    fab.setEnabled(true);
+
+                }
+                else {
+                    flag=false;
+                    //toggle disabled
+                    profile.setEnabled(false);
+                    name.setEnabled(false);
+                    email.setEnabled(false);
+             //       fab.setEnabled(false);
+                }
+            }
         });
+
+
     }
 
     protected void getUserAccount() {
@@ -67,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI(FullAccount account) {
-        ImageView profile = (ImageView) findViewById(R.id.imageView);
-        TextView name = (TextView) findViewById(R.id.name_textView);
-        TextView email = (TextView) findViewById(R.id.email_textView);
-
+        final ImageView profile = (ImageView) findViewById(R.id.imageView);
+        final TextView name = (TextView) findViewById(R.id.name_textView);
+        final TextView email = (TextView) findViewById(R.id.email_textView);
+        Switch aswitch = (Switch) findViewById(R.id.switch2);
         name.setText(account.getName().getDisplayName());
         email.setText(account.getEmail());
         Picasso.with(this)
@@ -80,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void upload() {
+        System.out.println("This is upload");
         if (ACCESS_TOKEN == null)return;
         //Select image to upload
         Intent intent = new Intent();
@@ -92,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("This is Activity Result");
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK || data == null) return;
         // Check which request we're responding to
