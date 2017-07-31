@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         aswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
                 if (isChecked) {
                     flag=true;
                     if (!tokenExists()) {
@@ -62,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
                     email.setEnabled(true);
                 //    fab.setEnabled(true);
 
+                    Intent serviceIntent = new Intent(getApplicationContext(), CameraCaptureService.class);
+                    Log.d("MainAct", "isChecked true!");
+                    //intent.setAction("com.example.powerhouse.directupload.action.startforeground");
+                    startService(serviceIntent);
+
                 }
                 else {
                     flag=false;
@@ -69,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
                     profile.setEnabled(false);
                     name.setEnabled(false);
                     email.setEnabled(false);
+
+                    Intent serviceIntent = new Intent(getApplicationContext(), CameraCaptureService.class);
+                    Log.d("MainAct", "isChecked false!");
+                    //intent.setAction("com.example.powerhouse.directupload.action.stopforeground");
+                    stopService(serviceIntent);
              //       fab.setEnabled(false);
                 }
             }
