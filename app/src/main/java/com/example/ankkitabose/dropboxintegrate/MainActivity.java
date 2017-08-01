@@ -3,6 +3,7 @@ package com.example.ankkitabose.dropboxintegrate;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int IMAGE_REQUEST_CODE = 101;
     private String ACCESS_TOKEN;
     private boolean flag=false;
+    private StatusDatabase db;
+    private String value = "false";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Log.d("Main","OnCreate() call");
         Switch aswitch = (Switch) findViewById(R.id.switch2);
         final ImageView profile = (ImageView) findViewById(R.id.imageView);
         final TextView name = (TextView) findViewById(R.id.name_textView);
@@ -44,8 +48,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }); */
 
+        db = new StatusDatabase(this);
+
+        Cursor cursor = db.getItem("check");
+        if(cursor.getCount()>0) {
+
+            cursor.moveToFirst();
+
+            value = cursor.getString(cursor.getColumnIndex("Item_Status"));
+            Log.d("Main","Found check !"+value);
+        }
+        if(value.equalsIgnoreCase("true"))
+            aswitch.setChecked(true);
+        else
+            aswitch.setChecked(false);
+
+
+
         aswitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                db.updateItem("check",Boolean.toString(isChecked));
 
                 if (isChecked) {
                     flag=true;
@@ -57,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     ACCESS_TOKEN = retrieveAccessToken();
+                    if(ACCESS_TOKEN!=null)
+                        db.updateItem("token",ACCESS_TOKEN);
                     getUserAccount();
                     profile.setEnabled(true);
                     name.setEnabled(true);
