@@ -11,11 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.users.FullAccount;
 import com.squareup.picasso.Picasso;
 
@@ -40,13 +43,7 @@ public class MainActivity extends AppCompatActivity {
         final ImageView profile = (ImageView) findViewById(R.id.imageView);
         final TextView name = (TextView) findViewById(R.id.name_textView);
         final TextView email = (TextView) findViewById(R.id.email_textView);
-   /*     final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                upload();
-            }
-        }); */
+        final Button SignInButton = (Button) findViewById(R.id.sign_in_button);
 
         db = new StatusDatabase(this);
 
@@ -72,21 +69,30 @@ public class MainActivity extends AppCompatActivity {
 
                 if (isChecked) {
                     flag=true;
-                    if (!tokenExists()) {
-                        //No token
-                        //Back to LoginActivity
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                    }
+                    SignInButton.setEnabled(true);
+                    SignInButton.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view) {
+                            if (!tokenExists()) {
+                                System.out.println("This is Auth");
+                                Auth.startOAuth2Authentication(getApplicationContext(), getString(R.string.APP_KEY));
 
+                            }
+                            else
+                                Toast.makeText(getApplicationContext(), "Already Logged in!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    if (!tokenExists())
+                        getAccessToken();
+                    System.out.println("Dammnnnn");
                     ACCESS_TOKEN = retrieveAccessToken();
-                    if(ACCESS_TOKEN!=null)
-                        db.updateItem("token",ACCESS_TOKEN);
                     getUserAccount();
                     profile.setEnabled(true);
                     name.setEnabled(true);
                     email.setEnabled(true);
-                //    fab.setEnabled(true);
+
+                    System.out.println("If entry point");
 
                     Intent serviceIntent = new Intent(getApplicationContext(), CameraCaptureService.class);
                     Log.d("MainAct", "isChecked true!");
@@ -100,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
                     profile.setEnabled(false);
                     name.setEnabled(false);
                     email.setEnabled(false);
+                    SignInButton.setEnabled(false);
+                    System.out.println("If entry point");
 
                     Intent serviceIntent = new Intent(getApplicationContext(), CameraCaptureService.class);
                     Log.d("MainAct", "isChecked false!");
@@ -111,6 +119,38 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onResume() {
+
+        System.out.println("This is resume!");
+        super.onResume();
+        getAccessToken();
+        ACCESS_TOKEN = retrieveAccessToken();
+        getUserAccount();
+        final Button SignInButton = (Button) findViewById(R.id.sign_in_button);
+        SignInButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if (tokenExists())
+                    Toast.makeText(getApplicationContext(), "Already Logged in!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public void getAccessToken() {
+        String accessToken = Auth.getOAuth2Token(); //generate Access Token
+        if (accessToken != null) {
+            //Store accessToken in SharedPreferences
+            SharedPreferences prefs = getSharedPreferences("com.example.ankkitabose.dropboxintegrate", Context.MODE_PRIVATE);
+            prefs.edit().putString("access-token", accessToken).apply();
+
+            //Proceed to MainActivity
+            //   Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            //  startActivity(intent);
+        }
     }
 
     protected void getUserAccount() {
